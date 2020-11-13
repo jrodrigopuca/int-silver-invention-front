@@ -1,6 +1,6 @@
 import React,{Component} from 'react';
 import Nav from './nav.jsx';
-
+import './publicacion.css';
 class Publicacion extends Component{
     constructor(){
         super();
@@ -21,11 +21,15 @@ class Publicacion extends Component{
                 })
                 .then(response=>response.json())
                 .then(myJSON=>{
+                    if (!myJSON.res){
+                        alert(myJSON.data);
+                        localStorage.removeItem('jwt');
+                    }
+
                     this.setState({
                         logeado:myJSON.res,
                         data: myJSON.res?myJSON.data:[{}]
                     })
-                    if (!myJSON.res) alert(myJSON.data)
                 })
     }
 
@@ -34,17 +38,20 @@ class Publicacion extends Component{
         return(
         <React.Fragment>
             <Nav/>
-            <h1>Publicaciones</h1>
-            {logeado ? (
-                <ul>
-                    {data.map(item=>(
-                        <li key={item.id}>
-                            {item.title}
-                        </li>
-                    ))}
-                </ul>)
-                : (<p> Aún no iniciaste sesión para ver este contenido </p>)
-            }
+            <>
+                <h1>Publicaciones</h1>
+                {logeado ? (
+                    <ul>
+                        {data.map(item=>(
+                            <li className="publicacion" key={item.id}>
+                                <h3>{item.title}</h3>
+                                <p>{item.body}</p>
+                            </li>
+                        ))}
+                    </ul>)
+                    : (<p> Aún no iniciaste sesión para ver este contenido </p>)
+                }
+            </>
         </React.Fragment>)
     }
 }

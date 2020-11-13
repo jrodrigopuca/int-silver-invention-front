@@ -74,9 +74,11 @@ class Login extends Component{
             <Nav/>
             {terminado||logeado?(<Redirect to="/posts"/>):
                 (<form method="POST" onSubmit={(e)=>this._onSubmit(e)}>
-                <input type="text"  id="user" name="user" autoComplete="name" placeholder="Usuario" required onChange={(e)=>this._onChange(e,"user")} />
-                <input type="password" id="pass" name="pass" autoComplete="current-password" placeholder="Contraseña" required onChange={(e)=>this._onChange(e,"pass")} />
-                {!!valido && <input type="submit" value="Enviar" />}
+                    <input type="text" className="input-field"  id="user" name="user" autoComplete="name" placeholder="Usuario" required onChange={(e)=>this._onChange(e,"user")} />
+                    <br/>
+                    <input type="password" id="pass" name="pass" autoComplete="current-password" placeholder="Contraseña" required onChange={(e)=>this._onChange(e,"pass")} />
+                    <br/>
+                    {!!valido && <input type="submit" value="Enviar" />}
                 </form>)
             }
 
