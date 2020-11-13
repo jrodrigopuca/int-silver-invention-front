@@ -6,7 +6,7 @@ class Publicacion extends Component{
         super();
         this.state ={
             data: [{}],
-            estado:null
+            logeado:false
         }
     }
 
@@ -22,7 +22,7 @@ class Publicacion extends Component{
                 .then(response=>response.json())
                 .then(myJSON=>{
                     this.setState({
-                        estado:myJSON.res,
+                        logeado:myJSON.res,
                         data: myJSON.res?myJSON.data:[{}]
                     })
                     if (!myJSON.res) alert(myJSON.data)
@@ -30,11 +30,12 @@ class Publicacion extends Component{
     }
 
     render(){
-        const {data, estado}= this.state;
+        const {data, logeado}= this.state;
         return(
         <React.Fragment>
             <Nav/>
-            {estado && (
+            <h1>Publicaciones</h1>
+            {logeado ? (
                 <ul>
                     {data.map(item=>(
                         <li key={item.id}>
@@ -42,6 +43,7 @@ class Publicacion extends Component{
                         </li>
                     ))}
                 </ul>)
+                : (<p> Aún no iniciaste sesión para ver este contenido </p>)
             }
         </React.Fragment>)
     }

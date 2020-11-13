@@ -1,21 +1,19 @@
 import React,{Component} from 'react';
 import Nav from './nav.jsx';
-import {PaginatedList} from 'react-paginated-list';
 
-class Login extends Component{
-
+class Galeria extends Component{
     constructor(){
         super();
         this.state ={
             data: [{}],
-            estado:null
+            logeado:false
         }
     }
 
     componentDidMount(){
         const jwt = localStorage.getItem('jwt');
 
-        fetch('http://localhost:3001/fotos',{
+        fetch('http://localhost:3001/posts',{
                 method:'GET',
                 headers:{
                     'Content-Type':'application/json',
@@ -24,7 +22,7 @@ class Login extends Component{
                 .then(response=>response.json())
                 .then(myJSON=>{
                     this.setState({
-                        estado:myJSON.res,
+                        logeado:myJSON.res,
                         data: myJSON.res?myJSON.data:[{}]
                     })
                     if (!myJSON.res) alert(myJSON.data)
@@ -32,31 +30,23 @@ class Login extends Component{
     }
 
     render(){
-        const {data, estado}= this.state;
+        const {data, logeado}= this.state;
         return(
         <React.Fragment>
             <Nav/>
-            {estado && (
-                <PaginatedList
-                    list={data}
-                    itemsPerPage={10}
-                    renderList={(lista)=>(
-                        <React.Fragment>
-                            {lista.map((x)=>{
-                                return(
-                                    <div key={x.id}>
-                                        {x.thumbnailUrl}
-                                    </div>
-                                )
-                            })}
-                        </React.Fragment>
-                    )}
-
-
-                />
-            )}
+            <h1>Galeria</h1>
+            {logeado ? (
+                <ul>
+                    {data.map(item=>(
+                        <li key={item.id}>
+                            {item.title}
+                        </li>
+                    ))}
+                </ul>)
+                : (<p> Aún no iniciaste sesión para ver este contenido </p>)
+            }
         </React.Fragment>)
     }
 }
 
-export default Login;
+export default Galeria;

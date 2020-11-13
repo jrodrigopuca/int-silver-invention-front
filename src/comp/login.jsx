@@ -1,5 +1,6 @@
 import React,{Component} from 'react';
 import Nav from './nav.jsx';
+import {Redirect} from 'react-router-dom';
 
 class Login extends Component{
     constructor(){
@@ -8,8 +9,12 @@ class Login extends Component{
             entradas: {user:false, pass:false},
             valido:false,
             terminado:false,
-            terminadoConErrores:false
+            logeado:false
         }
+    }
+
+    componentDidMount(){
+        this.setState({logeado:!!localStorage.getItem('jwt')});
     }
 
     /** validar que los campos fueron cargados */
@@ -25,17 +30,18 @@ class Login extends Component{
 
     /**
      * @description enviar al back
-     * - si el login es correcto guardar token
+     * - si el login es correcto guardar token y redirigir 
      * - lo guardo en localStorage pero también podría encriptarlo para usarlo con cookie o bien en memoria 
      * - si el login es incorrecto mostrar alerta
      * @param {*} e evento
      */
     _onSubmit(e){
         e.preventDefault();
+
+        // formar POST
         let form = new FormData(e.target);
         form=JSON.stringify(Object.fromEntries(form));
         let link="http://localhost:3001/login";
-
 
         let myHeaders = new Headers({
             'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
@@ -45,14 +51,15 @@ class Login extends Component{
         let options = { method: 'POST', headers: myHeaders, mode: 'cors' };
         let nRequest = new Request(link, options);
 
+        // enviar POST
         fetch(nRequest, {
             body: form,
-        }).then(function (response) {
-            return response.json();
         })
-        .then(function (myJSON) {
-            alert(!!myJSON.res?"login correcto":myJSON.data);
+        .then(response=>response.json())
+        .then((myJSON)=>{
             if (myJSON.res) localStorage.setItem('jwt', myJSON.data);
+            this.setState({terminado: myJSON.res});
+            alert(!!myJSON.res?"login correcto":myJSON.data);
         })
         
         e.target.reset();
@@ -60,16 +67,19 @@ class Login extends Component{
 
 
     render(){
-        const {valido}= this.state;
+        const {valido, terminado, logeado}= this.state;
 
         return(
             <React.Fragment>
             <Nav/>
-            <form method="POST" onSubmit={(e)=>this._onSubmit(e)}>
-                <input type="text"  id="user" name="user" placeholder="Usuario" required onChange={(e)=>this._onChange(e,"user")} />
-                <input type="password" id="pass" name="pass" placeholder="Contraseña" required onChange={(e)=>this._onChange(e,"pass")} />
+            {terminado||logeado?(<Redirect to="/posts"/>):
+                (<form method="POST" onSubmit={(e)=>this._onSubmit(e)}>
+                <input type="text"  id="user" name="user" autoComplete="name" placeholder="Usuario" required onChange={(e)=>this._onChange(e,"user")} />
+                <input type="password" id="pass" name="pass" autoComplete="current-password" placeholder="Contraseña" required onChange={(e)=>this._onChange(e,"pass")} />
                 {!!valido && <input type="submit" value="Enviar" />}
-            </form>
+                </form>)
+            }
+
             </React.Fragment>
         )
     }
